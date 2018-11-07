@@ -1,4 +1,4 @@
-package main.java.me.nathan3882.javamysql;
+package me.nathan3882.javamysql;
 
 import java.sql.*;
 
