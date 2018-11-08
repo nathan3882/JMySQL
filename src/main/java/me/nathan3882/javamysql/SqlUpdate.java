@@ -1,10 +1,14 @@
 package me.nathan3882.javamysql;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class SqlUpdate {
 
     private final Connection connection;
+    private PreparedStatement preparedStatement;
 
     public SqlUpdate(SqlConnection sqlConnection) {
         this.connection = sqlConnection.getConnection();
@@ -12,17 +16,18 @@ public class SqlUpdate {
 
     /**
      * used for insert, delete and update
-     * executeUpdate("INSERT INTO table (UserName) VALUES ('User533252')");
+     * executeUpdate("INSERT INTO table (UserName) VALUES (5)");
      *
      * @return success or not
      */
-    public boolean executeUpdate(String sql, SqlConnection.SqlTableName name) {
+    public boolean executeUpdate(String sql, String name) {
         PreparedStatement preparedStatement = null;
         try {
             connection.setAutoCommit(true);
             preparedStatement = connection.prepareStatement(
-                    sql.replace("{table}", name.toString()),
+                    sql.replace("{table}", name),
                     Statement.RETURN_GENERATED_KEYS);
+
             preparedStatement.executeUpdate();
             close(preparedStatement);
         } catch (SQLException e) {

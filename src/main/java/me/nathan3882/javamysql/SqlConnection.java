@@ -5,12 +5,12 @@ import java.sql.DriverManager;
 
 public class SqlConnection {
 
-    public interface SqlTableName {
-        String TABLE_ONE = "tableOneName";
-        String TABLE_TWO = "tableTwoName";
-    }
-
     private boolean open;
+
+    public interface SqlTableName {
+        String TABLE_ONE = "tableone";
+        String TABLE_TWO = "tabletwo";
+    }
 
     private String host = "localhost";
     private String databaseName = "userdata";
