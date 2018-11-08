@@ -16,10 +16,10 @@ public class JavaMySQL implements SqlConnection.SqlTableName {
         SqlQuery query = new SqlQuery(connection);
         query.executeQuery("SELECT aNumber IN {table} WHERE aString = 'foobar'", TABLE_ONE);
         ResultSet firstResultSet = query.getResultSet();
-        if (firstResultSet.next()) {
-            int aNumber = firstResultSet.getInt(1);
+        if (query.next(false)) {
+            int aNumber = query.getInt(1);
         }
-        firstResultSet.close(); //Don't forget to close the result set after manipulation
+        query.close();
 
 
 
@@ -28,9 +28,9 @@ public class JavaMySQL implements SqlConnection.SqlTableName {
 
         ResultSet secondResultSet = anotherQuery.getResultSet("SELECT aString IN {table} WHERE aNumber = 66", TABLE_TWO);
         if (secondResultSet.next()) {
-            String aString = secondResultSet.getString(1);
+            String aString = anotherQuery.getString(1);
         }
-        secondResultSet.close();
+        anotherQuery.close();
 
         connection.closeConnection();
     }
