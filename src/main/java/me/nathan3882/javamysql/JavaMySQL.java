@@ -26,9 +26,9 @@ public class JavaMySQL implements SqlConnection.SqlTableName {
         SqlConnection anotherValidConnection = new SqlConnection("localhost", 3306, "anotherDatabase", "userTwo", "password");
         SqlQuery anotherQuery = new SqlQuery(anotherValidConnection);
 
-        ResultSet secondResultSet = anotherQuery.getResultSet("SELECT aString IN {table} WHERE aNumber = 66", TABLE_TWO);
+        ResultSet secondResultSet = anotherQuery.getResultSet("SELECT aString IN {table} WHERE aNumber = 66", TABLE_ONE);
         if (secondResultSet.next()) {
-            String aString = anotherQuery.getString(1);
+            String aString = anotherQuery.getString("column");
         }
         anotherQuery.close();
 

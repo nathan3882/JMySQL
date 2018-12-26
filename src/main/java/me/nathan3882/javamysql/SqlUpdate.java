@@ -8,10 +8,14 @@ import java.sql.Statement;
 public class SqlUpdate {
 
     private final Connection connection;
-    private PreparedStatement preparedStatement;
 
     public SqlUpdate(SqlConnection sqlConnection) {
         this.connection = sqlConnection.getConnection();
+        try {
+            if (connection.isClosed()) sqlConnection.openConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -21,7 +25,7 @@ public class SqlUpdate {
      * @return success or not
      */
     public boolean executeUpdate(String sql, String name) {
-        PreparedStatement preparedStatement = null;
+        PreparedStatement preparedStatement;
         try {
             connection.setAutoCommit(true);
             preparedStatement = connection.prepareStatement(

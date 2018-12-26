@@ -2,25 +2,20 @@ package me.nathan3882.javamysql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class SqlConnection {
 
     private boolean open;
-
-    public interface SqlTableName {
-        String TABLE_ONE = "tableone";
-        String TABLE_TWO = "tabletwo";
-    }
-
     private String host = "localhost";
     private String databaseName = "userdata";
     private int port = 3306;
     private String username = "root";
     private String password = "";
-
     private Connection connection;
 
     public SqlConnection() {
+        this.connection = newCon();
     }
 
     public SqlConnection(String host, int port, String databaseName, String username, String password) {
@@ -37,13 +32,27 @@ public class SqlConnection {
      * @return success or not
      */
     public void openConnection() {
-        if (open) return;
+        if (!connectionEstablished()) {
+            newCon();
+        }
+        if (connectionEstablished()) {
+            try {
+                if (open) return;
+                Class.forName("com.mysql.jdbc.Driver");
+                this.connection = newCon();
+                open = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private Connection newCon() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            this.connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + databaseName + "?allowMultiQueries=true", username, password);
-            open = true;
+            return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + databaseName + "?useSSL=false&allowMultiQueries=true", username, password);
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
     }
 
@@ -52,6 +61,11 @@ public class SqlConnection {
             close(connection);
             open = false;
         }
+    }
+
+    public boolean connectionEstablished() {
+        if (this.connection == null) openConnection();
+        return this.connection != null;
     }
 
     public Connection getConnection() {
@@ -66,4 +80,20 @@ public class SqlConnection {
         }
     }
 
+    public boolean isClosed() {
+        try {
+            return this.connection.isClosed();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isOpen() {
+        return !isClosed();
+    }
+
+    public interface SqlTableName {
+        String TABLE_ONE = "tableOneName";
+    }
 }

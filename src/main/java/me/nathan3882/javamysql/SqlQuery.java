@@ -8,14 +8,24 @@ import java.sql.SQLException;
 public class SqlQuery {
 
     private final Connection connection;
+    private String host = "localhost";
+    private String databaseName = "userdata";
+    private int port = 3306;
+    private String username = "root";
+    private String password = "";
     private PreparedStatement preparedStatement;
     private ResultSet resultSet = null;
 
     public SqlQuery(SqlConnection cction) {
         this.connection = cction.getConnection();
+        try {
+            if (connection.isClosed()) cction.openConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public SqlQuery executeQuery(String sql, String name) {
+    public ResultSet executeQuery(String sql, String name) {
         if (resultSet != null) {
             close();
         }
@@ -27,8 +37,9 @@ public class SqlQuery {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return this;
+        return this.resultSet;
     }
+
 
     public ResultSet getResultSet() {
         return this.resultSet;
@@ -53,14 +64,6 @@ public class SqlQuery {
     public String getString(String columnName) {
         try {
             return resultSet.getString(columnName);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    public String getString(int columnIndex) {
-        try {
-            return resultSet.getString(columnIndex);
         } catch (SQLException e) {
             e.printStackTrace();
         }
