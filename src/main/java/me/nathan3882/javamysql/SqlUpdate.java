@@ -8,8 +8,11 @@ import java.sql.Statement;
 public class SqlUpdate {
 
     private final Connection connection;
+    private final JavaMySQL javaMySQL;
 
     public SqlUpdate(SqlConnection sqlConnection) {
+        this.javaMySQL = sqlConnection.getJavaMySQL();
+        sqlConnection.openConnection();
         this.connection = sqlConnection.getConnection();
         try {
             if (connection.isClosed()) sqlConnection.openConnection();
@@ -25,19 +28,20 @@ public class SqlUpdate {
      * @return success or not
      */
     public boolean executeUpdate(String sql, String name) {
-        PreparedStatement preparedStatement;
-        try {
-            connection.setAutoCommit(true);
-            preparedStatement = connection.prepareStatement(
-                    sql.replace("{table}", name),
-                    Statement.RETURN_GENERATED_KEYS);
-
-            preparedStatement.executeUpdate();
-            close(preparedStatement);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        if (javaMySQL.getSqlConnection().connectionEstablished(true)) {
+            PreparedStatement preparedStatement;
+            try {
+                connection.setAutoCommit(true);
+                preparedStatement = connection.prepareStatement(
+                        sql.replace("{table}", name),
+                        Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.executeUpdate();
+                close(preparedStatement);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else return false;
         return true;
     }
 

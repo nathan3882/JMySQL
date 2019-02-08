@@ -1,41 +1,37 @@
 package me.nathan3882.javamysql;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLNonTransientConnectionException;
 
 public class SqlQuery {
 
-    private final Connection connection;
-    private String host = "localhost";
-    private String databaseName = "userdata";
-    private int port = 3306;
-    private String username = "root";
-    private String password = "";
+    private SqlConnection cction;
+    private JavaMySQL JavaMySQL;
     private PreparedStatement preparedStatement;
     private ResultSet resultSet = null;
 
     public SqlQuery(SqlConnection cction) {
-        this.connection = cction.getConnection();
-        try {
-            if (connection.isClosed()) cction.openConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        this.JavaMySQL = cction.getJavaMySQL();
+        this.cction = cction;
     }
 
     public ResultSet executeQuery(String sql, String name) {
-        if (resultSet != null) {
-            close();
-        }
-        try {
-            this.preparedStatement = connection.prepareStatement(
-                    sql.replace("{table}", name));
-
-            this.resultSet = preparedStatement.executeQuery();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (cction.connectionEstablished(true)) {
+            if (resultSet != null) {
+                close();
+            }
+            cction.openConnection();
+            try {
+                this.preparedStatement = cction.getConnection().prepareStatement(
+                        sql.replace("{table}", name));
+                this.resultSet = preparedStatement.executeQuery();
+            } catch (SQLNonTransientConnectionException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return this.resultSet;
     }
@@ -54,16 +50,25 @@ public class SqlQuery {
         boolean next = false;
         try {
             next = resultSet.next();
-            if (close) connection.close();
+            if (close) cction.getConnection().close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return next;
     }
 
-    public String getString(String columnName) {
+    public long getLong(int column) {
         try {
-            return resultSet.getString(columnName);
+            return resultSet.getLong(column);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1L;
+    }
+
+    public String getString(int column) {
+        try {
+            return resultSet.getString(column);
         } catch (SQLException e) {
             e.printStackTrace();
         }

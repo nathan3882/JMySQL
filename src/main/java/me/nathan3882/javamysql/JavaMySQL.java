@@ -5,8 +5,13 @@ import java.sql.SQLException;
 
 public class JavaMySQL implements SqlConnection.SqlTableName {
 
+    private static JavaMySQL instance = new JavaMySQL();
+    private SqlConnection sql;
+
     public static void main(String[] args) throws SQLException {
-        SqlConnection connection = new SqlConnection();
+        JavaMySQL instance = JavaMySQL.get();
+                SqlConnection connection = new SqlConnection(instance);
+        instance.sql = connection;
 
         connection.openConnection();
 
@@ -23,15 +28,23 @@ public class JavaMySQL implements SqlConnection.SqlTableName {
 
 
 
-        SqlConnection anotherValidConnection = new SqlConnection("localhost", 3306, "anotherDatabase", "userTwo", "password");
+        SqlConnection anotherValidConnection = new SqlConnection(instance, "localhost", 3306, "anotherDatabase", "userTwo", "password");
         SqlQuery anotherQuery = new SqlQuery(anotherValidConnection);
 
         ResultSet secondResultSet = anotherQuery.getResultSet("SELECT aString IN {table} WHERE aNumber = 66", TABLE_ONE);
         if (secondResultSet.next()) {
-            String aString = anotherQuery.getString("column");
+            String aString = anotherQuery.getString(1);
         }
         anotherQuery.close();
 
         connection.closeConnection();
+    }
+
+    private static JavaMySQL get() {
+        return instance;
+    }
+
+    public SqlConnection getSqlConnection() {
+        return sql;
     }
 }
